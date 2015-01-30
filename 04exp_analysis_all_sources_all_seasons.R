@@ -1,5 +1,4 @@
 #calculate the lambda for each source (S,C,P) regardless of seasons (4seasons), since control X is not real pathogen
-
 Sum1_new<-0
 select.mean_week_total_new1<-NULL
 hislook_new<-NULL
@@ -24,46 +23,36 @@ for(Source in c('Cattle','Poultry','Swine')){
         }
       }
       if (!is.null(select.mean_week_new1)){
-         #nexp.estimate<- my.fitdist.exp.estimate(as.numeric(select.mean_week[,1]))
-         #print(nexp.estimate)
-         #nexp.estimate1<-format(nexp.estimate,digits=3)
-         #nexp.sd<-my.fitdist.exp.sd(as.numeric(select.mean_week[,1]))
-         #print(nexp.sd)
-         #nexp.sd<-format(nexp.sd,digits=3)
-         #plot(select.mean_week[,1]~select.mean_week[,2],type="p",xlab="week", ylab="concentration",
-           #main=paste("concentration vs week_",Source,"\n",method,"\n","lambda=",nexp.estimate1,",","sd=",nexp.sd), sub=season)
-         #curve(1/nexp.estimate*exp(-x/nexp.estimate),col = "blue",add = TRUE)
+        #nexp.estimate<- my.fitdist.exp.estimate(as.numeric(select.mean_week[,1]))
+        #print(nexp.estimate)
+        #nexp.estimate1<-format(nexp.estimate,digits=3)
+        #nexp.sd<-my.fitdist.exp.sd(as.numeric(select.mean_week[,1]))
+        #print(nexp.sd)
+        #nexp.sd<-format(nexp.sd,digits=3)
+        #plot(select.mean_week[,1]~select.mean_week[,2],type="p",xlab="week", ylab="concentration",
+          #main=paste("concentration vs week_",Source,"\n",method,"\n","lambda=",nexp.estimate1,",","sd=",nexp.sd), sub=season)
+        #curve(1/nexp.estimate*exp(-x/nexp.estimate),col = "blue",add = TRUE)
         
-         lambda<- my.glm.exp.lambda(as.numeric(select.mean_week_new1[,2]),as.numeric(select.mean_week_new1[,1]))
-         lambda.intercept<- my.glm.exp.lambda.intercept(as.numeric(select.mean_week_new1[,2]),as.numeric(select.mean_week_new1[,1]))
+        lambda<- my.glm.exp.lambda(as.numeric(select.mean_week_new1[,2]),as.numeric(select.mean_week_new1[,1]))
+        lambda.intercept<- my.glm.exp.lambda.intercept(as.numeric(select.mean_week_new1[,2]),as.numeric(select.mean_week_new1[,1]))
         lambda1<-format(as.numeric(log(2)/-lambda),digits=3)
-         print(lambda1)
-         #temp.look <- cbind(select.mean_week1[,1],select.mean_week1[,2])
+        print(lambda1)
+        #temp.look <- cbind(select.mean_week1[,1],select.mean_week1[,2])
         hislook_new<- rbind(hislook_new,cbind(as.numeric(lambda1), lambda,lambda.intercept,method,Source))
-         #print(paste(dim(temp.look)[[1]],dim(temp.look)[[2]],season,method))
-         plot(jitter(as.numeric(select.mean_week_new1[,1]))~select.mean_week_new1[,2],type="p",xlab="week", ylab="concentration",
-           main=paste(Source,"\n",method,"\n","half-life=",as.numeric(lambda1)*7, "days"))
-         
-              curve(exp(lambda.intercept)*exp(x*lambda),add=TRUE,col="blue")
-         #curve(exp(lambda.intercept)*exp(x*lambda1),col = "blue",add = TRUE)
-
-        #lines(predict(loess(as.numeric(select.mean_week[,1])~as.numeric(select.mean_week[,2])))~as.numeric(select.mean_week[,2]),lty=3)
-         
-         #select.mean_week_total<-rbind(select.mean_week_total,select.mean_week1) 
- }
-       else
-       {
-         print("There is no data!!!")
-       }
-     }
-   
-  
- }
-  
-dev.off()
-
+        #print(paste(dim(temp.look)[[1]],dim(temp.look)[[2]],season,method))
+        plot(jitter(as.numeric(select.mean_week_new1[,1]))~select.mean_week_new1[,2],type="p",xlab="week", ylab="concentration",
+          main=paste(Source,"\n",method,"\n","half-life=",as.numeric(lambda1)*7, "days"))
+          curve(exp(lambda.intercept)*exp(x*lambda),add=TRUE,col="blue")
+          #curve(exp(lambda.intercept)*exp(x*lambda1),col = "blue",add = TRUE)
+          #lines(predict(loess(as.numeric(select.mean_week[,1])~as.numeric(select.mean_week[,2])))~as.numeric(select.mean_week[,2]),lty=3)
+          #select.mean_week_total<-rbind(select.mean_week_total,select.mean_week1) 
+      } else {
+        print("There is no data!!!")
+      }
+    }
   }
-
+  dev.off()
+}
 
 
 hislook_new<-as.data.frame(hislook_new,stringsAsFactors=FALSE)
