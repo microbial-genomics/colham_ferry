@@ -1,9 +1,0 @@
-"Enter 1 if measurement was below the detectable level, otherwise enter 0 in the BelowDetectionLevel column.",,
-SampleID comes from the Experiment setup workbook.,,
-Add a sheet for each measurement.,,
-,,
-,,
-,,
-,,
-,,
-SampleID,CampylobactorCulturable_mpnCFUPerml,BeloDetectableLevel

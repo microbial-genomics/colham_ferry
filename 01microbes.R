@@ -1,9 +1,7 @@
-#impor the data from csv files
-root.path <- path.expand("~/git/colham_ferry/csvs/")
-#root.path <- "//AA.AD.EPA.GOV/ORD/ATH/USERS/ygu02/Net MyDocuments/Dropbox/colham_ferry/microbes/csv/"
-filenames<-list.files(path = root.path, pattern = ".+[^.]Runoff.csv$")
+
+filenames<-list.files(path = path.csv.in, pattern = ".+[^.]Runoff.csv$")
 All <- lapply(filenames,function(iname){
-    iname <- paste(root.path,iname,sep="")
+    iname <- paste(path.csv.in,iname,sep="")
     test.x <- length(scan(iname,what=character(),nlines=1,skip=1))
     if(test.x>0){
       read.csv(iname, header=T)
@@ -74,11 +72,12 @@ blank.plots <- which(acf[,1]=="")
 acf <- acf[-blank.plots,]
 
 names(acf) <- c("plot","result","dl","method")
-write.csv(acf,file=paste(root.path,"check_acf.csv",sep=""))
+write.csv(acf,file=paste(path.csv.out,"check_acf.csv",sep=""))
 
 #create a new matrix 
 nplot<-nrow(acf)
-Runoff<-matrix(data=NA,nrow =nplot,ncol=7, byrow=TRUE, dimnames= list(c(), c("season", "PlotID", "Source", "ElapsedTimeSinceRunoffStarted_Minutes", "data","detection level", "method")))
+Runoff<-matrix(data=NA,nrow =nplot,ncol=7, byrow=TRUE, dimnames= list(c(), 
+            c("season", "PlotID", "Source", "ElapsedTimeSinceRunoffStarted_Minutes", "data","detection level", "method")))
 
 
 for (i in 1:nplot){
@@ -107,30 +106,25 @@ for (i in 1:nplot){
   }
 }
 
-write.csv(Runoff,file=paste(root.path,"Runoff_new.csv",sep=""))
+write.csv(Runoff,file=paste(path.csv.out,"Runoff_new.csv",sep=""))
 
 Runoff1<-as.data.frame(Runoff, stringsAsFactors=FALSE)
 
-
-
-
-
-
-split_plot<-read.csv(paste(root.path,"split-plot design.csv",sep=""),header=TRUE)
+split_plot<-read.csv(paste(path.csv.in,"split-plot design.csv",sep=""),header=TRUE)
 newRunoff0<-merge(Runoff1,split_plot,by.x="PlotID", by.y="plot", all.x = TRUE, all.y = TRUE)
-write.csv(newRunoff0,file=paste(root.path,"Runoff_splitplot.csv",sep=""))
+write.csv(newRunoff0,file=paste(path.csv.out,"Runoff_splitplot.csv",sep=""))
 
 Runoff2<- na.omit(Runoff1)
 #create a new matrix with updated detection frequencies, analysis type.... ^-^
 nplot1<-nrow(Runoff2)
-UnewRunoff<-matrix(data=NA,nrow =nplot1,ncol=13, byrow=TRUE, dimnames= list(c(), c("season", "PlotID", "Source", "ElapsedTimeSinceUnewRunoffStarted_Minutes", "data","proxy","detection level", "method",
-"detection frequency","type of mictobes","analysis type","amended field","names of microbes")))
-for (i in 1:5)
-UnewRunoff[,i] <- Runoff2[,i]
-for (i in 5:7)
-UnewRunoff[,i+1] <- Runoff2[,i]
+UnewRunoff<-matrix(data=NA,nrow =nplot1,ncol=13, byrow=TRUE, dimnames= list(c(), 
+                c("season", "PlotID", "Source", "ElapsedTimeSinceUnewRunoffStarted_Minutes", "data",
+                  "proxy","detection level", "method","detection frequency","type of mictobes",
+                  "analysis type","amended field","names of microbes")))
+for (i in 1:5){UnewRunoff[,i] <- Runoff2[,i]}
+for (i in 5:7){UnewRunoff[,i+1] <- Runoff2[,i]}
+
 #define time field
-  
 indx <- grep("^30.+", Runoff2[,4], fixed=FALSE)
 UnewRunoff[indx,4]<-30
 
@@ -147,160 +141,79 @@ UnewRunoff[indx,4]<-0
 UnewRunoff[,9]<-1 # detection frequency
 UnewRunoff[,12]<-0 #amanded field
 
- # define a column called detection frequency based on detection leves (indicator variable) 
+# define a column called detection frequency based on detection leves (indicator variable) 
 indx <- grep("ANP", UnewRunoff[,7], fixed=FALSE, ignore.case = TRUE)
 UnewRunoff[indx,6]<-NA
 UnewRunoff[indx,9]<-NA
  
 
-  for (DL in c("BDL","BQL","ND") )
-  {
-indx <-grep(DL,UnewRunoff[,7], fixed=FALSE,ignore.case = TRUE)
-UnewRunoff[indx,6]<-as.numeric(Runoff2[indx,5])/2 #for now estimate non-detects as 0.5*detection limit,-- 
-#create new field called proxy that is equal to observation when detected, 0.5*detection limit when not
- UnewRunoff[indx,9]<-0
+for (DL in c("BDL","BQL","ND")){
+  indx <-grep(DL,UnewRunoff[,7], fixed=FALSE,ignore.case = TRUE)
+  UnewRunoff[indx,6]<-as.numeric(Runoff2[indx,5])/2 #for now estimate non-detects as 0.5*detection limit,-- 
+  #create new field called proxy that is equal to observation when detected, 0.5*detection limit when not
+  UnewRunoff[indx,9]<-0
 }
 
 # define a column called amended field for for(seasons B,C,D for Salmonella, Ecoli0157,Crypto, Giardia), 
 #others not amended (indicator variable)
 indx <- grep("A", UnewRunoff[,1], invert=TRUE)
-
-  for (amended in c("Salmonella", "Ecoli0157","Crypto","Giardia"))
-  {
+for (amended in c("Salmonella", "Ecoli0157","Crypto","Giardia")){
     indx1<- grep(amended, Runoff2[indx,7],ignore.case = TRUE, fixed = FALSE)
     UnewRunoff[indx1,12]<- 1
-     }
+}
   
-
-
-
 #create factor field for indicators (entero, Ecoli, Clostridium) and pathogens (Salmonella, Camplylobacter, Ecoli0157,Crypt, Giardia)
 #create factor field for analysis type: molecular (GU,TSC) or Culturable (MPN,CFU)
-
-for (string1 in c("entero","Ecoli","Clostridium", "TotalColiforms"))
-{
+for (string1 in c("entero","Ecoli","Clostridium", "TotalColiforms")){
   indx2<-grep(string1, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
- UnewRunoff[indx2,10]<-"indicator"
+  UnewRunoff[indx2,10]<-"indicator"
 }
 
-for (string2 in c("Salmonella", "Campylobacter","EColi0157"))
-{
-   indx3<-grep(string2, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
+for (string2 in c("Salmonella", "Campylobacter","EColi0157")){
+  indx3<-grep(string2, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
   UnewRunoff[indx3,10]<-"bacteriapathogens"
 }
  
-for (string3 in c("Crypto", "Giardia"))
-{
+for (string3 in c("Crypto", "Giardia")){
   indx3.5<-grep(string3, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
   UnewRunoff[indx3.5,10]<-"parasiticpathogens"
 }
 
-
-
-for (type1 in c("*_GU","*_TSC"))
-{
+for (type1 in c("*_GU","*_TSC")){
   indx4<-grep(type1, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
   UnewRunoff[indx4,11]<-"molecular"
 }
   
- for (type2 in c("*_MPN","*_CFU","*cysts")) 
- {
+for (type2 in c("*_MPN","*_CFU","*cysts")){
    indx5<-grep(type2, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
      UnewRunoff[indx5,11]<-"culturable"
-   
- }
+}
 
 # add pathogen field from analysis type: entero, Ecoli, Clostridium, Salmonella, Camplylobacter, Ecoli0157,Crypt, Giardia
 for (string3 in c("entero", "EColi", "Clostridium", "Salmonella", "Campylobacter", 
-                  "EColi0157", "Crypto","Giardia"))
-{
+                  "EColi0157", "Crypto","Giardia")){
   indx6<-grep(string3, Runoff2[,7],ignore.case = TRUE, fixed = FALSE)
   UnewRunoff[indx6,13]<- string3
-  
-  }
+}
 
 UnewRunoff1<-as.data.frame(UnewRunoff,stringsAsFactors = FALSE)
 UnewRunoff2<- na.omit(UnewRunoff1)
 UnewRunoff3 <- NULL
-for(Source in c('C','P','S','X'))
-{
-for (method in unique(UnewRunoff2$method)) {
- print(sprintf("%s--%s", Source, method))
- 
-   indx <- which(Source==UnewRunoff2$Source & method == UnewRunoff2$method)
- select.season<- UnewRunoff2[indx,]
-   if(length(indx) > 0) {
-     select.data1 <- UnewRunoff2[indx,]
-     Countseason<-unique(select.data1$season)
-     if (length( Countseason)==4)
-        UnewRunoff3<-rbind(UnewRunoff3,UnewRunoff2[indx,])
-   }
- 
-}
-  
+for(Source in c('C','P','S','X')){
+  for (method in unique(UnewRunoff2$method)){
+    print(sprintf("%s--%s", Source, method))
+    indx <- which(Source==UnewRunoff2$Source & method == UnewRunoff2$method)
+    select.season<- UnewRunoff2[indx,]
+    if(length(indx) > 0){select.data1 <- UnewRunoff2[indx,]}
+    Countseason<-unique(select.data1$season)
+    if (length( Countseason)==4){UnewRunoff3<-rbind(UnewRunoff3,UnewRunoff2[indx,])}
+  }
 }
  
-write.csv(UnewRunoff3,file=paste(root.path,"UnewRunoff3_final.csv",sep=""))
+write.csv(UnewRunoff3,file=paste(path.csv.out,"UnewRunoff3_final.csv",sep=""))
 
-split_plot<-read.csv(paste(root.path,"split-plot design.csv",sep=""),header=TRUE)
+split_plot<-read.csv(paste(path.csv.in,"split-plot design.csv",sep=""),header=TRUE)
 UnewRunoff4<-merge(UnewRunoff3,split_plot,by.x="PlotID", by.y="plot")
-write.csv(UnewRunoff4,file=paste(root.path,"colham_ferry_df.csv",sep=""))
-  
- 
-  
-
-
-
-
-
-
-#plot the scatterplot (concentration vesus week) for each analysis method and season
-newRunoff[which(is.na(newRunoff$data)),]$data<-NULL
-
-#newRunoff <- na.omit(newRunoff) #delete all NAs in newRunoff
-for (method in unique(newRunoff$method)) {
- print(method)
- pdf(paste(root.path,"./scatterplot_", method, ".pdf", sep=""))
- par(mfrow=c(2,2))
- for(season in c('A','B','C','D')) {
-   print(season)
-   indx <- which(method == newRunoff$method & season == newRunoff$season)
-   if(length(indx) > 0) {
-     select.data <- newRunoff[indx,]
-   
-     #data.plot <-cbind(select.data$week,select.data$data)
-     plot(select.data$week,select.data$data,type = "p", main=paste("concentration vs week_", method), 
-          sub=season, xlab="week", ylab="concentration")
-   }
- }
-
- dev.off()
-}
-
-
-#plot the box plot (concentration vesus week) for each analysis method and season
-#newRunoff[which(is.na(newRunoff$data)),]$data <- NULL
-#newRunoff <- na.omit(newRunoff) #delete all NAs in newRunoff
-for(Source in c('C','P','S','X'))
-{
-  print(Source)
-for (method in unique(newRunoff$method)) {
- print(method)
- pdf(paste(root.path,"./boxplot_", Source,"_", method, ".pdf", sep=""))
- par(mfrow=c(2,2))
- for(season in c('A','B','C','D')) {
-   print(season)
-   indx <- which(Source==newRunoff$Source & method == newRunoff$method & season == newRunoff$season)
-   if(length(indx) > 0) {
-     select.data <- newRunoff[indx,]
-     #data.plot <-cbind(select.data$week,select.data$data)
-     boxplot(as.numeric(select.data$data)~select.data$week,data=select.data,xlab="week", ylab="concentration", col="lightblue", range=0,
-             main=paste("concentration vs week_",Source,"\n",method), 
-          sub=season)
-   }
- }
-
- dev.off()
-}
-}
+UnewRunoff4[,5] <- as.numeric(UnewRunoff4[,5])
+write.csv(UnewRunoff4,file=paste(path.csv.out,"colham_ferry_df.csv",sep=""))
 
