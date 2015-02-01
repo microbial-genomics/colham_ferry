@@ -28,8 +28,6 @@ All[delete.list] <- NULL
 #filenames <- gsub("-",".",filenames)
 #names(All) <- gsub(".csv","",filenames)
 
-
-
 Ntoget <- length(All)
 
 acf<- NULL
@@ -78,7 +76,6 @@ write.csv(acf,file=paste(path.csv.out,"check_acf.csv",sep=""))
 nplot<-nrow(acf)
 Runoff<-matrix(data=NA,nrow =nplot,ncol=7, byrow=TRUE, dimnames= list(c(), 
             c("season", "PlotID", "Source", "ElapsedTimeSinceRunoffStarted_Minutes", "data","detection level", "method")))
-
 
 for (i in 1:nplot){
   Runoff[i,1]<-substr(acf[i,1],1,1)
@@ -146,7 +143,6 @@ indx <- grep("ANP", UnewRunoff[,7], fixed=FALSE, ignore.case = TRUE)
 UnewRunoff[indx,6]<-NA
 UnewRunoff[indx,9]<-NA
  
-
 for (DL in c("BDL","BQL","ND")){
   indx <-grep(DL,UnewRunoff[,7], fixed=FALSE,ignore.case = TRUE)
   UnewRunoff[indx,6]<-as.numeric(Runoff2[indx,5])/2 #for now estimate non-detects as 0.5*detection limit,-- 

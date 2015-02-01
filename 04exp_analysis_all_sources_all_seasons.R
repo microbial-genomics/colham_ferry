@@ -3,7 +3,7 @@ Sum1_new<-0
 select.mean_week_total_new1<-NULL
 hislook_new<-NULL
 for(Source in c('Cattle','Poultry','Swine')){
-  pdf(paste(root.path,"./newmeanofcon_EXDdecaymodelplotID_", Source, "_", method, ".pdf", sep=""))
+  pdf(paste(path.graphics,"newmeanofcon_EXDdecaymodelplotID_", Source, "_", method, ".pdf", sep=""))
   par(mfrow=c(2,4))
   for (method in unique(UnewRunoff5$method)){
     indxnew2 <- which(Source==UnewRunoff5$Source & method == UnewRunoff5$method)
@@ -59,11 +59,6 @@ hislook_new<-as.data.frame(hislook_new,stringsAsFactors=FALSE)
 names(hislook_new)[1]<-"half-life"
 
 
-
-
-
-
-
 #scatter plot for mean of the concentration at each plotID for each week
 #Sum2<-0
 select.mean_week_total_new<-NULL
@@ -77,15 +72,8 @@ select.data111<-rbind(select.data111,UnewRunoff5[indx111,])
 }
 
 
-
-
-
-
-pdf(paste(root.path,"./newmeanofcon_EXDdecaymodelplotID_", method, ".pdf", sep=""))
-  
+pdf(paste(path.graphics,"newmeanofcon_EXDdecaymodelplotID_", method, ".pdf", sep=""))  
  for (method in unique(select.data111$method)) {
-
-  
    indxnew1<- which(method == select.data111$method)
      if(length(indxnew1) > 0)
      {
@@ -154,8 +142,5 @@ pdf(paste(root.path,"./newmeanofcon_EXDdecaymodelplotID_", method, ".pdf", sep="
        }
      
    }
-   
- 
 }
-
 dev.off()

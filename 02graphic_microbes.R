@@ -46,7 +46,6 @@ for(Source in c('C','P','S','X')){
   }
 }
 
-
 #plot the box plot (concentration versus week) for each analysis method and season
 for(Source in c('C','P','S','X')){
   for (method in unique(UnewRunoff4$method)){
@@ -65,7 +64,6 @@ for(Source in c('C','P','S','X')){
   }
 }
  
-
 my.t.test.p.value1 <- function(x,y) {
   obj<-try(t.test(x,y, var.equal=F), silent=TRUE)
   if (is(obj, "try-error")) return(NA) else return(obj$p.value)
@@ -178,8 +176,4 @@ names(select_mean_week_total)[8]<-"type of mictobes"
 names(select_mean_week_total)[9]<-"analysis type"
 names(select_mean_week_total)[10]<-"names of microbes"
 names(select_mean_week_total)[11]<-"day"
-write.csv(select_mean_week_total,file=paste(path.csv_out,"select_mean_week_total.csv",sep=""))
-
-
-
-
+write.csv(select_mean_week_total,file=paste(path.csv.out,"select_mean_week_total.csv",sep=""))

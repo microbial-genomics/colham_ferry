@@ -3,14 +3,14 @@
 
 #source commands
 Sys.info()
-compname <- Sys.info()[4]
+compname <- Sys.info()[4][[1]]
 
 #import the data from csv files
-if(compname == "stp-air.local"){ #Tom mac
-  path.root <- path.expand("~/git/colham_ferry")
-  path.csv.in <- path.expand("~/git/colham_ferry/csv_in")
-  path.csv.out <- path.expand("~/git/colham_ferry/csv_out")
-  path.graphics <- path.expand("~/git/colham_ferry/graphics")
+if((compname == "stp-air-3.local")){ #Tom mac
+  path.root <- path.expand("~/git/colham_ferry/")
+  path.csv.in <- path.expand("~/git/colham_ferry/csv_in/")
+  path.csv.out <- path.expand("~/git/colham_ferry/csv_out/")
+  path.graphics <- path.expand("~/git/colham_ferry/graphics/")
 } else if(compname == "DC2626UTPURUCKE"){ #Tom cts windows
   path.root <- path.expand("C:\\git\\colham_ferry\\")
   path.csv.in <- path.expand("C:\\git\\colham_ferry\\csv_in\\")
@@ -20,3 +20,6 @@ if(compname == "stp-air.local"){ #Tom mac
 #root.path <- "//AA.AD.EPA.GOV/ORD/ATH/USERS/ygu02/Net MyDocuments/Dropbox/colham_ferry/microbes/csv/"
 
 file.exists(path.root)
+file.exists(path.csv.in)
+file.exists(path.csv.out)
+file.exists(path.graphics)
