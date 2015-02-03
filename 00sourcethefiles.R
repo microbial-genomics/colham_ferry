@@ -2,7 +2,9 @@
 # code from Yin Gu, Tommy Bohrmann, and Tom Purucker
 
 #source commands
+R.version
 Sys.info()
+sessionInfo()
 compname <- Sys.info()[4][[1]]
 
 #import the data from csv files
@@ -23,3 +25,6 @@ file.exists(path.root)
 file.exists(path.csv.in)
 file.exists(path.csv.out)
 file.exists(path.graphics)
+
+#execute R files
+source(paste(path.root,"01microbes.R",sep=""))

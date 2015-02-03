@@ -3,36 +3,38 @@ str(UnewRunoff4)
 newRunoff <- UnewRunoff4
 
 #plot the scatterplot (concentration vesus week) for each analysis method and season
-newRunoff[which(is.na(newRunoff$data)),]$data<-NULL
+newRunoff[which(is.na(newRunoff$data)),]$data <- NULL
 #newRunoff <- na.omit(newRunoff) #delete all NAs in newRunoff
 
+unique(newRunoff$method)
+
+pdf(paste(path.graphics,"scatterplots.pdf", sep=""))
+par(mfrow=c(2,2))
 for(method in unique(newRunoff$method)){
   print(method)
-  pdf(paste(path.graphics,"./scatterplot_", method, ".pdf", sep=""))
-  par(mfrow=c(2,2))
   for(season in c('A','B','C','D')) {
     print(season)
     indx <- which(method == newRunoff$method & season == newRunoff$season)
     if(length(indx) > 0) {
       select_data <- newRunoff[indx,]
-      
       #data.plot <-cbind(select_data$week,select_data$data)
-      plot(select_data$week,select_data$data,type = "p", main=paste("concentration vs week_", method), 
+      plot(select_data$week,select_data$data,type = "p", main=method, 
            sub=season, xlab="week", ylab="concentration")
     }
   }  
-  dev.off()
 }
+dev.off()
 
 #plot the box plot (concentration vesus week) for each analysis method and season
 #newRunoff[which(is.na(newRunoff$data)),]$data <- NULL
 #newRunoff <- na.omit(newRunoff) #delete all NAs in newRunoff
-for(Source in c('C','P','S','X')){
+#View(newRunoff)
+for(method in unique(newRunoff$method)){
+  pdf(paste(path.graphics,"boxplots_", method, ".pdf", sep=""))
+  par(mfrow=c(2,2))
   print(Source)
-  for(method in unique(newRunoff$method)){
+  for(Source in c('C','P','S','X')){
     print(method)
-    pdf(paste(path.graphics,"./boxplot_", Source,"_", method, ".pdf", sep=""))
-    par(mfrow=c(2,2))
     for(season in c('A','B','C','D')){
       print(season)
       indx <- which(Source==newRunoff$Source & method == newRunoff$method & season == newRunoff$season)
@@ -42,8 +44,8 @@ for(Source in c('C','P','S','X')){
                 main=paste("concentration vs week_",Source,"\n",method), sub=season)
       }
     }
-    dev.off()
   }
+  dev.off()
 }
 
 #plot the box plot (concentration versus week) for each analysis method and season

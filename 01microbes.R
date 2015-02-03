@@ -154,8 +154,8 @@ for (DL in c("BDL","BQL","ND")){
 #others not amended (indicator variable)
 indx <- grep("A", UnewRunoff[,1], invert=TRUE)
 for (amended in c("Salmonella", "Ecoli0157","Crypto","Giardia")){
-    indx1<- grep(amended, Runoff2[indx,7],ignore.case = TRUE, fixed = FALSE)
-    UnewRunoff[indx1,12]<- 1
+  indx1<- grep(amended, Runoff2[indx,7],ignore.case = TRUE, fixed = FALSE)
+  UnewRunoff[indx1,12]<- 1
 }
   
 #create factor field for indicators (entero, Ecoli, Clostridium) and pathogens (Salmonella, Camplylobacter, Ecoli0157,Crypt, Giardia)
@@ -212,4 +212,3 @@ split_plot<-read.csv(paste(path.csv.in,"split-plot design.csv",sep=""),header=TR
 UnewRunoff4<-merge(UnewRunoff3,split_plot,by.x="PlotID", by.y="plot")
 UnewRunoff4[,5] <- as.numeric(UnewRunoff4[,5])
 write.csv(UnewRunoff4,file=paste(path.csv.out,"colham_ferry_df.csv",sep=""))
-
